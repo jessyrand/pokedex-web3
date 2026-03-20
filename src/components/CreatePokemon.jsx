@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const pokemonTypes = [
+  "normal","fire","water","electric","grass","ice","fighting","poison",
+  "ground","flying","psychic","bug","rock","ghost","dragon","dark","steel","fairy"
+];
+
 export default function CreatePokemon() {
   const navigate = useNavigate();
 
@@ -50,7 +55,21 @@ export default function CreatePokemon() {
         <input name="name" placeholder="Name" onChange={handleChange} required />
         <input name="height" placeholder="Height" onChange={handleChange} required />
         <input name="weight" placeholder="Weight" onChange={handleChange} required />
-        <input name="type" placeholder="Type (fire, water...)" onChange={handleChange} required />
+        <div className="flex flex-col gap-1">
+            <label htmlFor="type" className="">Type :</label>
+            <select
+                id="type"
+                name="type"
+                value={form.type}
+                onChange={handleChange}
+                className="p-2 rounded-xl"
+                required
+            >
+                {pokemonTypes.map((type) => (
+                <option key={type} value={type}>{type}</option>
+                ))}
+            </select>
+        </div>
         <input name="ability" placeholder="Ability" onChange={handleChange} required />
         <button className="bg-blue-500 text-white p-2 rounded-xl">Create</button>
       </form>
