@@ -60,28 +60,28 @@ export default function PokemonList() {
   useEffect(() => {
     const stored = localStorage.getItem("pokemons");
 
-    if(stored) {
+    if (stored) {
       setPokemons(JSON.parse(stored));
-    } else{
+    } else {
       fetch('https://pokeapi.co/api/v2/pokemon?limit=20')
-      .then((response) => response.json())
-      .then((data) => {
-        Promise.all(
-          data.results.map((pokemon) =>
-            fetch(pokemon.url).then((res) => res.json())
+        .then((response) => response.json())
+        .then((data) => {
+          Promise.all(
+            data.results.map((pokemon) =>
+              fetch(pokemon.url).then((res) => res.json())
+            )
           )
-        )
-          .then((pokemonDetails) => {
-            setPokemons(pokemonDetails);
-            localStorage.setItem("pokemons", JSON.stringify(pokemonDetails));
-          })
-          .catch((error) => {
-            console.error('Error fetching Pokemons', error);
-          });
-      })
-      .catch((error) => {
-        console.error('Error fetching Pokemons', error);
-      });
+            .then((pokemonDetails) => {
+              setPokemons(pokemonDetails);
+              localStorage.setItem("pokemons", JSON.stringify(pokemonDetails));
+            })
+            .catch((error) => {
+              console.error('Error fetching Pokemons', error);
+            });
+        })
+        .catch((error) => {
+          console.error('Error fetching Pokemons', error);
+        });
     }
   }, []);
 
@@ -100,8 +100,8 @@ export default function PokemonList() {
     )
   }
 
-  return (     
-    <div  className="flex flex-col justify-center items-center h-full w-full background">
+  return (
+    <div className="flex flex-col justify-center items-center h-full w-full background">
       <div className="flex flex-wrap justify-center h-full max-w-[1920px] gap-5 gap-y-5 py-5">
         <div className="flex justify-between items-center h-22 w-full bg-gray-400 p-5 top-0 fixed z-50 opacity-90 shadow-2xl">
           <img className="w-50" src="/logo.png" alt="" />
@@ -111,6 +111,11 @@ export default function PokemonList() {
             onChange={((e) => setSearch(e.target.value.toLowerCase()))}
             className="w-200 p-4 border-3 font-pokemon rounded-4xl h-15 border-gray-600 text-center focus:outline-none font-bold"
           />
+          <Link to="/create">
+            <button className="bg-green-500 text-white px-4 py-2 rounded-xl font-bold cursor-pointer">
+              Créer un pokemon
+            </button>
+          </Link>
           <img className="w-50" src="/pokeball.png" alt="" />
         </div>
 
@@ -128,13 +133,13 @@ export default function PokemonList() {
                   ))}
                 </div>
                 <div className="flex flex-col items-center bg-gray-300">
-                    <img src={pokemon.sprites.other['official-artwork'].front_default}
+                  <img src={pokemon.sprites.other['official-artwork'].front_default}
                     className={`h-[30vh] w-[15vw] rounded-lg`} alt="" />
                 </div>
                 <div className="flex flex-col items-center">
-                    <p className="text-2xl bg-gray-200 rounded-4xl p-2 h-12 w-12 text-center font-pokemon">{pokemon.id}</p>
-                <h2 className="text-2xl font-bold font-pokemon">{pokemon.name}</h2>
-            </div>
+                  <p className="text-2xl bg-gray-200 rounded-4xl p-2 h-12 w-12 text-center font-pokemon">{pokemon.id}</p>
+                  <h2 className="text-2xl font-bold font-pokemon">{pokemon.name}</h2>
+                </div>
               </Link>
             ))
           }
