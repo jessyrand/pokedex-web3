@@ -58,7 +58,12 @@ export default function PokemonList() {
   const filteredPokemons = pokemons.filter((pokemon) => pokemon.name.toLowerCase().includes(search));
 
   useEffect(() => {
-    fetch('https://pokeapi.co/api/v2/pokemon?limit=20')
+    const stored = localStorage.getItem("pokemons");
+
+    if(stored) {
+      setPokemons(JSON.parse(stored));
+    } else{
+      fetch('https://pokeapi.co/api/v2/pokemon?limit=20')
       .then((response) => response.json())
       .then((data) => {
         Promise.all(
@@ -68,6 +73,7 @@ export default function PokemonList() {
         )
           .then((pokemonDetails) => {
             setPokemons(pokemonDetails);
+            localStorage.setItem("pokemons", JSON.stringify(pokemonDetails));
           })
           .catch((error) => {
             console.error('Error fetching Pokemons', error);
@@ -76,7 +82,14 @@ export default function PokemonList() {
       .catch((error) => {
         console.error('Error fetching Pokemons', error);
       });
+    }
   }, []);
+
+  useEffect(() => {
+    if (pokemons.length > 0) {
+      localStorage.setItem("pokemons", JSON.stringify(pokemons));
+    }
+  }, [pokemons]);
 
   if (pokemons.length === 0) {
     return (
