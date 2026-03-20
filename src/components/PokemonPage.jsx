@@ -54,7 +54,7 @@ const typeTextColors = {
 
 export default function PokemonPage() {
   const [pokemon, setPokemon] = useState(null);
-  const {pokemonName} = useParams();
+  const { pokemonName } = useParams();
   const navigate = useNavigate();
   const [category, setCategory] = useState("");
   const [story, setStory] = useState("");
@@ -62,14 +62,23 @@ export default function PokemonPage() {
 
 
   useEffect(() => {
-    if(pokemonName){
-    const URL = `https://pokeapi.co/api/v2/pokemon/${pokemonName.toLowerCase()}`;
-    axios.get(URL).then((response) => {
-      setPokemon(response.data);
-    })
+    const stored = JSON.parse(localStorage.getItem("pokemons")) || [];
+    const localPokemon = stored.find(p => p.name.toLowerCase() === pokemonName.toLowerCase());
+
+    if (localPokemon) {
+      setPokemon(localPokemon);
+      return;
+    }
+
+    if (pokemonName) {
+      const URL = `https://pokeapi.co/api/v2/pokemon/${pokemonName.toLowerCase()}`;
+      axios.get(URL).then((response) => {
+        setPokemon(response.data);
+      })
         .catch((error) => {
           console.error('Error fetching Pokemons', error)
-          setPokemon(null)}
+          setPokemon(null)
+        }
         );
     } else {
       setPokemon(null);
@@ -79,49 +88,59 @@ export default function PokemonPage() {
 
   useEffect(() => {
     if (pokemonName) {
+      const stored = JSON.parse(localStorage.getItem("pokemons")) || [];
+      const localPokemon = stored.find(p => p.name.toLowerCase() === pokemonName.toLowerCase());
+
+      if (localPokemon) {
+        setCategory(localPokemon.category || "");
+        setStory(localPokemon.story || "No story available for " + pokemonName);
+        setGender(localPokemon.gender || "");
+        return;
+      }
+      
       fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonName.toLowerCase()}/`)
-          .then((res) => res.json())
-          .then((data) => {
-            setCategory(data.genera.find(genus => genus.language.name === "en")?.genus);
+        .then((res) => res.json())
+        .then((data) => {
+          setCategory(data.genera.find(genus => genus.language.name === "en")?.genus);
 
-            const story = data.flavor_text_entries
-                .filter(entry => entry.language.name === "en")
-                .map(entry => entry.flavor_text)
-                .filter((text, index, self) => self.indexOf(text) === index)
-                .slice(0, 5)
-                .join("\n\n");
-            setStory(story.length > 0 ? story : "No story available for "+ pokemonName);
+          const story = data.flavor_text_entries
+            .filter(entry => entry.language.name === "en")
+            .map(entry => entry.flavor_text)
+            .filter((text, index, self) => self.indexOf(text) === index)
+            .slice(0, 5)
+            .join("\n\n");
+          setStory(story.length > 0 ? story : "No story available for " + pokemonName);
 
-            const genderRate = data.gender_rate;
-            let genderDisplay = null;
-            if (genderRate === -1) {
-              genderDisplay = <FontAwesomeIcon icon="question" className="text-gray-500 text-2xl" />;
-            } else if (genderRate === 0){
-              genderDisplay = <FontAwesomeIcon icon="mars" className="text-blue-500 text-2xl" />
-            } else if (genderRate === 8){
-              genderDisplay = <FontAwesomeIcon icon="venus" className="text-rose-500 text-2xl" />
-            }
-            else{
-              genderDisplay = (
-                  <div className="flex gap-2">
-                    <FontAwesomeIcon icon="mars" className="text-blue-500 text-2xl" />
-                    <FontAwesomeIcon icon="venus" className="text-rose-500 text-2xl" />
-                  </div>
-              )
-            }
-            setGender(genderDisplay)
-          })
-          .catch((error) => console.error("Error fetching species data", error));
+          const genderRate = data.gender_rate;
+          let genderDisplay = null;
+          if (genderRate === -1) {
+            genderDisplay = <FontAwesomeIcon icon="question" className="text-gray-500 text-2xl" />;
+          } else if (genderRate === 0) {
+            genderDisplay = <FontAwesomeIcon icon="mars" className="text-blue-500 text-2xl" />
+          } else if (genderRate === 8) {
+            genderDisplay = <FontAwesomeIcon icon="venus" className="text-rose-500 text-2xl" />
+          }
+          else {
+            genderDisplay = (
+              <div className="flex gap-2">
+                <FontAwesomeIcon icon="mars" className="text-blue-500 text-2xl" />
+                <FontAwesomeIcon icon="venus" className="text-rose-500 text-2xl" />
+              </div>
+            )
+          }
+          setGender(genderDisplay)
+        })
+        .catch((error) => console.error("Error fetching species data", error));
     }
   }, [pokemonName]);
 
 
   if (pokemon === null /*|| !Array.isArray(pokemons) || pokemons.length === 0*/) {
     return (
-        <div className="w-full h-screen flex flex-col justify-center text-center items-center font-pokemon text-4xl loading gap-5">
-          <h1 className="animate-pulse text-5xl">Loading ...</h1>
-          <img className="animate-spin w-50" src="/loading.png" alt="" />
-        </div>
+      <div className="w-full h-screen flex flex-col justify-center text-center items-center font-pokemon text-4xl loading gap-5">
+        <h1 className="animate-pulse text-5xl">Loading ...</h1>
+        <img className="animate-spin w-50" src="/loading.png" alt="" />
+      </div>
     )
   }
 
@@ -129,8 +148,8 @@ export default function PokemonPage() {
     <div className="w-[90vw] flex flex-col justify-center gap-5 p-3">
 
       <Link to="/home" className="flex gap-2 items-center inset-0 relative left-30">
-          <FontAwesomeIcon icon="arrow-left" className= {`cursor-pointer hover:duration-500 hover:scale-150 ${typeTextColors[pokemon.types[0].type.name]}`}
-          />
+        <FontAwesomeIcon icon="arrow-left" className={`cursor-pointer hover:duration-500 hover:scale-150 ${typeTextColors[pokemon.types[0].type.name]}`}
+        />
         <p className="font-bold">Pokedex</p>
       </Link>
       <div className="w-full flex justify-between items-center gap-10 ml-25">
@@ -142,15 +161,15 @@ export default function PokemonPage() {
               <p className="text-gray-400 text-2xl font-bold">#00{pokemon.id}</p>
             </div>
             <div>
-                <div className="flex gap-2">
-                  {pokemon.types.map((type, index) => (
-                      <p
-                          key={`${type.type.name}-${index}`}
-                          className={`${typeBgColors[type.type.name]} px-5 py-1 rounded-2xl flex justify-center text-sm`}>
-                        {type.type.name}
-                      </p>
-                  ))}
-                </div>
+              <div className="flex gap-2">
+                {pokemon.types.map((type, index) => (
+                  <p
+                    key={`${type.type.name}-${index}`}
+                    className={`${typeBgColors[type.type.name]} px-5 py-1 rounded-2xl flex justify-center text-sm`}>
+                    {type.type.name}
+                  </p>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -194,7 +213,7 @@ export default function PokemonPage() {
               <h2 className="font-bold text-xl">Abilities</h2>
               <p>{
                 pokemon.abilities.slice(0, 1).map((abilityObj, index) => (
-                    <p key={index}>{abilityObj.ability.name}</p>
+                  <p key={index}>{abilityObj.ability.name}</p>
                 ))
               }</p>
             </div>
