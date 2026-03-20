@@ -4,6 +4,8 @@ import App from './App.jsx'
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import NotFoundPage from './components/NotFoundPage.jsx';
 import PokemonPage from './components/PokemonPage.jsx';
+import CreatePokemon from "./components/CreatePokemon.jsx";
+
 
 const router = createBrowserRouter([
   {
@@ -19,6 +21,10 @@ const router = createBrowserRouter([
   {
     path: "/pokemon/:pokemonName",
     element: <PokemonPage />,
+  },
+  {
+    path: "/create",
+     element: <CreatePokemon />
   },
   {
     path: "*",
