@@ -26,8 +26,10 @@ export default function CreatePokemon() {
 
     const stored = JSON.parse(localStorage.getItem("pokemons")) || [];
 
+    const newId = (stored.length + 1);
+
     const newPokemon = {
-      id: Date.now(),
+      id: newId,
       name: form.name,
       height: Number(form.height),
       weight: Number(form.weight),
@@ -51,12 +53,12 @@ export default function CreatePokemon() {
   return (
     <div className="flex flex-col items-center justify-center h-screen gap-5">
       <h1 className="text-3xl font-bold">Create Pokémon</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-80">
-        <input name="name" placeholder="Name" onChange={handleChange} required />
-        <input name="height" placeholder="Height" onChange={handleChange} required />
-        <input name="weight" placeholder="Weight" onChange={handleChange} required />
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5 w-80">
+        <input name="name" placeholder="Name" className="pl-1" onChange={handleChange} required />
+        <input name="height" placeholder="Height" className="pl-1" onChange={handleChange} required />
+        <input name="weight" placeholder="Weight" className="pl-1" onChange={handleChange} required />
         <div className="flex flex-col gap-1">
-            <label htmlFor="type" className="">Type :</label>
+            <label htmlFor="type" className="pl-1">Type :</label>
             <select
                 id="type"
                 name="type"
@@ -70,7 +72,7 @@ export default function CreatePokemon() {
                 ))}
             </select>
         </div>
-        <input name="ability" placeholder="Ability" onChange={handleChange} required />
+        <input name="ability" placeholder="Ability" className="pl-1" onChange={handleChange} required />
         <button className="bg-blue-500 text-white p-2 rounded-xl">Create</button>
       </form>
     </div>
